@@ -38,7 +38,7 @@ IN_SAMPLES = int(IN_RATE * FRAME_MS / 1000)
 OUT_BLOCK = int(OUT_RATE * 0.02)
 
 # Конфигурация инструментов
-VECTOR_STORE_ID = "fvturiafv519uk7brocf"
+VECTOR_STORE_ID = "..."
 
 
 # ======== Вспомогательные функции ========
