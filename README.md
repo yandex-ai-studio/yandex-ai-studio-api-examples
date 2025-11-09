@@ -36,6 +36,6 @@ yandex-ai-studio-api-examples/
 ## Полезные ссылки
 
 - [Документация Yandex AI Studio](https://yandex.cloud/ru/docs/ai-studio/)
-- [Пошаговые инструкции (tutorials)](https://yandex.cloud/ru/docs/ai-studio/tutorials/)
-- [Model Gallery](https://yandex.cloud/ru/docs/ai-studio/models/)
+- [Пошаговые инструкции](https://yandex.cloud/ru/docs/ai-studio/operations/)
+- [Model Gallery](https://yandex.cloud/ru/docs/ai-studio/concepts/generation/)
 - [Yandex Cloud Community](https://t.me/YFM_Community)
