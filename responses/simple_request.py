@@ -12,6 +12,7 @@ client = openai.OpenAI(
 
 response = client.responses.create(
     model=f"gpt://{YANDEX_CLOUD_FOLDER}/{YANDEX_CLOUD_MODEL}",
+    instructions="Ты креативный ассистент. Помогаешь с генерацией идей.",
     input="Придумай 3 необычные идеи для стартапа в сфере путешествий.",
     temperature=0.4,
     max_output_tokens=1500

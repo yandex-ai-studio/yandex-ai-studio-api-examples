@@ -9,16 +9,14 @@ client = openai.OpenAI(
     base_url="https://rest-assistant.api.cloud.yandex.net/v1",
     project=YANDEX_CLOUD_FOLDER
 )
-
 response = client.responses.create(
     prompt={
         "id": "........",
         "variables": {
-            "city": "Чита",
-            "friends_number": "0"
+            "city": "Иркутск",
+            "friends_number": "3"
         }
     },
-    input="Куда пойти вечером? Где понюхать багульник?",
+    input="Куда пойти вечером?",
 )
-
 print(response.output_text)

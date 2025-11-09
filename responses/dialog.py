@@ -22,7 +22,7 @@ while True:
 
     response = client.responses.create(
         model=f"gpt://{YANDEX_CLOUD_FOLDER_ID}/{YANDEX_CLOUD_MODEL}",
-        input=[{"role": "user", "content": user_input}],
+        input=user_input,
         instructions="Ты — текстовый агент, который ведёт диалог и даёт информативные ответы на вопросы пользователя.",
         previous_response_id=previous_id  # передаём контекст, если он есть
     )
