@@ -10,6 +10,8 @@ import sys
 
 import aiohttp
 
+# Вспомогательные классы для работы с аудио. Можно использовать, можно реализовать самостоятельно.
+# pip install yandex-cloud-ml-sdk
 from yandex_cloud_ml_sdk._experimental.audio.microphone import AsyncMicrophone
 from yandex_cloud_ml_sdk._experimental.audio.out import AsyncAudioOut
 
