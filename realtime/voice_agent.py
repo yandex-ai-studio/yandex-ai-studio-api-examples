@@ -121,7 +121,7 @@ async def setup_session(ws):
                 "Если спрашивают о погоде — вызывай функцию get_weather. "
                 "При вопросе про чеклист для путешествий - обращайся к фукнции file_search"
             ),
-            "modalities": ["text", "audio"],
+            "modalities": ["audio"],
             "input_audio_format": "pcm16",
             "output_audio_format": "pcm16",
             "turn_detection": {
