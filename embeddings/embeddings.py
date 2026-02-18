@@ -15,7 +15,7 @@ MODELS = {
 client = openai.OpenAI(
     api_key=YANDEX_CLOUD_API_KEY,
     project=YANDEX_CLOUD_FOLDER,
-    base_url="https://llm.api.cloud.yandex.net/v1",
+    base_url="https://ai.api.cloud.yandex.net/v1",
 )
 
 # Данные
