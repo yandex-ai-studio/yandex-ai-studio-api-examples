@@ -8,7 +8,7 @@ YANDEX_FOLDER_ID = "<идентификатор_каталога>"
 def main():
     client = OpenAI(
         api_key=YANDEX_API_KEY,
-        base_url="https://rest-assistant.api.cloud.yandex.net/v1",
+        base_url="https://ai.api.cloud.yandex.net/v1",
         project=YANDEX_FOLDER_ID,
     )
 
