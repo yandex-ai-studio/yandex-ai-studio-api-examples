@@ -9,7 +9,7 @@ previous_id = None  # храним ID последнего ответа асси
 client = openai.OpenAI(
     api_key=YANDEX_CLOUD_API_KEY,
     project=YANDEX_CLOUD_FOLDER_ID,
-    base_url="https://rest-assistant.api.cloud.yandex.net/v1",
+    base_url="https://ai.api.cloud.yandex.net/v1",
 )
 
 print("Чат с агентом (введите 'выход' для выхода)\n")
