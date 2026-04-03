@@ -11,9 +11,9 @@ import sys
 import aiohttp
 
 # Вспомогательные классы для работы с аудио. Можно использовать, можно реализовать самостоятельно.
-# pip install yandex-cloud-ml-sdk
-from yandex_cloud_ml_sdk._experimental.audio.microphone import AsyncMicrophone
-from yandex_cloud_ml_sdk._experimental.audio.out import AsyncAudioOut
+# pip install yandex-ai-studio-sdk
+from yandex_ai_studio_sdk._experimental.audio.microphone import AsyncMicrophone
+from yandex_ai_studio_sdk._experimental.audio.out import AsyncAudioOut
 
 assert sys.version_info >= (3, 10), "Python 3.10+ is required"
 
