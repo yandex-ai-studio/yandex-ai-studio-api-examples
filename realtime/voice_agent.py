@@ -152,14 +152,14 @@ async def setup_session(ws):
                     "type": "function",
                     "name": "web_search",
                     "description": "Поиск в интернете",
-                    "parameters": "{}"
+                    "parameters": {}
                 },
                 # Встроенная функция для поиска по файлам.
                 {
                     "type": "function",
                     "name": "file_search",  # обязательное имя функции
                     "description": VECTOR_STORE_ID,  # id индекса
-                    "parameters": "{}"
+                    "parameters": {}
                 }
             ]
         }
