@@ -22,13 +22,12 @@ assert sys.version_info >= (3, 10), "Python 3.10+ is required"
 # Конфигурация аудио для сервера
 IN_RATE = 44100
 OUT_RATE = 44100
-CHANNELS = 1
 VOICE = "dasha"
 
 # Конфигурация инструментов
 VECTOR_STORE_ID = "..."
 
-# ==== Креды Облака ====
+# Креды Облака
 YANDEX_CLOUD_FOLDER_ID = "..."
 YANDEX_CLOUD_API_KEY = "..."
 
