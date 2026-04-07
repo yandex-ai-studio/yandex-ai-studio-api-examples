@@ -35,7 +35,7 @@ YANDEX_CLOUD_API_KEY = "..."
 assert YANDEX_CLOUD_FOLDER_ID and YANDEX_CLOUD_API_KEY, "YANDEX_CLOUD_FOLDER_ID и YANDEX_CLOUD_API_KEY обязательны"
 
 WSS_URL = (
-    f"wss://rest-assistant.api.cloud.yandex.net/v1/realtime/openai"
+    f"wss://ai.api.cloud.yandex.net/v1/realtime"
     f"?model=gpt://{YANDEX_CLOUD_FOLDER_ID}/speech-realtime-250923"
 )
 
@@ -120,15 +120,27 @@ async def setup_session(ws):
                 "Если спрашивают о погоде — вызывай функцию get_weather. "
                 "При вопросе про чеклист для путешествий - обращайся к фукнции file_search"
             ),
-            "modalities": ["audio"],
-            "input_audio_format": "pcm16",
-            "output_audio_format": "pcm16",
-            "turn_detection": {
-                "type": "server_vad",  # включаем серверный VAD
-                "threshold": 0.5,  # чувствительность
-                "silence_duration_ms": 400,  # длительность тишины для завершения речи
+            "output_modalities": ["audio"],
+            "audio": {
+                "input": {
+                    "format": {
+                        "type": "audio/pcm",
+                        "rate": IN_RATE
+                    },
+                    "turn_detection": {
+                        "type": "server_vad",  # включаем серверный VAD
+                        "threshold": 0.5,  # чувствительность
+                        "silence_duration_ms": 400,  # длительность тишины для завершения речи
+                    },
+                },
+                "output": {
+                    "format": {
+                        "type": "audio/pcm",
+                        "rate": OUT_RATE
+                    },
+                    "voice": VOICE,
+                },
             },
-            "voice": VOICE,
             # Инструменты для использования в агенте
             "tools": [
                 # Рукописная фукнция модели для демонстрации работы с function calling
