@@ -39,7 +39,7 @@ WSS_URL = (
     f"?model=gpt://{YANDEX_CLOUD_FOLDER_ID}/speech-realtime-250923"
 )
 
-HEADERS = {"Authorization": f"api-key {YANDEX_CLOUD_API_KEY}"}
+HEADERS = {"Authorization": f"Api-Key {YANDEX_CLOUD_API_KEY}"}
 
 
 # ======== Вспомогательные функции ========
