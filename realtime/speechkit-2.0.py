@@ -26,7 +26,7 @@ YANDEX_CLOUD_API_KEY = "..."
 assert YANDEX_CLOUD_FOLDER_ID and YANDEX_CLOUD_API_KEY, "YANDEX_CLOUD_FOLDER_ID и YANDEX_CLOUD_API_KEY обязательны"
 
 WSS_URL = (
-    f"wss://rest-assistant.api.cloud.yandex.net/v1/realtime/openai"
+    f"wss://ai.api.cloud.yandex.net/v1/realtime"
     f"?model=gpt://{YANDEX_CLOUD_FOLDER_ID}/speech-realtime-250923"
 )
 
@@ -174,12 +174,19 @@ async def setup_session(ws):
 - Убедись, что JSON валидный
 - Извлекай все найденные сущности
 """,
-            "modalities": ["text"],  # ТОЛЬКО ТЕКСТОВЫЙ ВЫВОД
-            "input_audio_format": "pcm16",
-            "turn_detection": {
-                "type": "server_vad",
-                "threshold": 0.5,
-                "silence_duration_ms": 400,
+            "output_modalities": ["text"],  # ТОЛЬКО ТЕКСТОВЫЙ ВЫВОД
+            "audio": {
+                "input": {
+                    "format": {
+                        "type": "audio/pcm",
+                        "rate": IN_RATE
+                    },
+                    "turn_detection": {
+                        "type": "server_vad",
+                        "threshold": 0.5,
+                        "silence_duration_ms": 400,
+                    },
+                }
             },
             "tools": []  # БЕЗ ФУНКЦИЙ
         }

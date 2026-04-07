@@ -26,11 +26,11 @@ YANDEX_CLOUD_API_KEY = "..."
 assert YANDEX_CLOUD_FOLDER_ID and YANDEX_CLOUD_API_KEY, "YANDEX_CLOUD_FOLDER_ID и YANDEX_CLOUD_API_KEY обязательны"
 
 WSS_URL = (
-    f"wss://rest-assistant.api.cloud.yandex.net/v1/realtime/openai"
+    f"wss://ai.api.cloud.yandex.net/v1/realtime"
     f"?model=gpt://{YANDEX_CLOUD_FOLDER_ID}/speech-realtime-250923"
 )
 
-HEADERS = {"Authorization": f"Api-Key {YANDEX_CLOUD_API_KEY}"}
+HEADERS = {"Authorization": f"api-key {YANDEX_CLOUD_API_KEY}"}
 
 
 # ======== Вспомогательные функции ========
@@ -63,12 +63,19 @@ async def setup_session(ws):
                 "Отвечаешь кратко и по делу, но с юмором когда уместно. "
                 "Если просят рассказать новости или найти информацию в интернете — используй функцию web_search."
             ),
-            "modalities": ["text"],  # ТОЛЬКО ТЕКСТОВЫЙ ВЫВОД
-            "input_audio_format": "pcm16",
-            "turn_detection": {
-                "type": "server_vad",
-                "threshold": 0.5,  # Чувствительность
-                "silence_duration_ms": 400,  # Пауза для завершения речи
+            "output_modalities": ["text"],  # ТОЛЬКО ТЕКСТОВЫЙ ВЫВОД
+            "audio": {
+                "input": {
+                    "format": {
+                        "type": "audio/pcm",
+                        "rate": IN_RATE
+                    },
+                    "turn_detection": {
+                        "type": "server_vad",  # включаем серверный VAD
+                        "threshold": 0.5,  # чувствительность
+                        "silence_duration_ms": 400,  # длительность тишины для завершения речи
+                    },
+                },
             },
             # Инструменты
             "tools": [
