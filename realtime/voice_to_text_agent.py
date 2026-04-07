@@ -177,11 +177,7 @@ async def main():
                 # Инициируем первый ответ ассистента
                 logger.info("Отправляем начальное приветствие...")
                 await ws.send_json({
-                    "type": "response.create",
-                    "response": {
-                        "modalities": ["text"],
-                        "conversation": "default",
-                    }
+                    "type": "response.create"
                 })
 
                 await asyncio.gather(
