@@ -8,6 +8,7 @@ import asyncio
 import base64
 import json
 import logging
+import re
 import sys
 
 import aiohttp
@@ -51,6 +52,40 @@ def b64_decode(s: str) -> bytes:
 # Кодирует байты в строку base64
 def b64_encode(b: bytes) -> str:
     return base64.b64encode(b).decode("ascii")
+
+
+# Паттерны для детекции автоответчика
+ANSWERING_MACHINE_PATTERNS = [
+    r'нажмите\s+\d+',  # "нажмите 1", "нажмите 2"
+    r'нажмите\s+(один|два|три|четыре|пять|шесть|семь|восемь|девять|ноль)',  # "нажмите один", "нажмите два"
+    r'для\s+\w+\s+нажмите',  # "для продолжения нажмите"
+    r'оставьте\s+сообщение',  # "оставьте сообщение"
+    r'после\s+сигнала',  # "после сигнала"
+    r'голосовое\s+меню',  # "голосовое меню"
+    r'автоответчик',  # "автоответчик"
+    r'выберите\s+\d+',  # "выберите 1"
+    r'выберите\s+(один|два|три|четыре|пять|шесть|семь|восемь|девять|ноль)',  # "выберите один"
+    r'для\s+связи\s+с\s+оператором',  # "для связи с оператором"
+    r'перевод\s+на\s+оператора',  # "перевод на оператора"
+    r'ожидайте\s+ответа',  # "ожидайте ответа"
+    r'все\s+операторы\s+заняты',  # "все операторы заняты"
+    r'звонок\s+будет\s+записан',  # "звонок будет записан"
+    r'для\s+качества\s+обслуживания',  # "для качества обслуживания"
+]
+
+
+def detect_answering_machine_by_text(text: str) -> tuple[bool, str]:
+    """
+    Проверяет текст на наличие признаков автоответчика
+    Возвращает (True, причина) если обнаружен автоответчик, иначе (False, "")
+    """
+    text_lower = text.lower()
+    
+    for pattern in ANSWERING_MACHINE_PATTERNS:
+        if re.search(pattern, text_lower, re.IGNORECASE):
+            return True, f"Обнаружен паттерн автоответчика: '{pattern}' в тексте: '{text}'"
+    
+    return False, ""
 
 
 # Настройка логирования
@@ -102,6 +137,22 @@ def process_function_call(item):
         print(f"📝 Саммари диалога:\n   {summary}")
         print("="*80 + "\n")
         logger.info(f"Завершение диалога: summary={summary}")
+    elif function_name == "detect_answering_machine":
+        summary = args.get("summary", "")
+        reason = args.get("reason", "")
+        # Возвращаем информацию в JSON формате
+        output = json.dumps({
+            "summary": summary,
+            "reason": reason
+        }, ensure_ascii=False)
+        # Выводим информацию об обнаружении автоответчика
+        print("\n" + "="*80)
+        print("🤖 ОБНАРУЖЕН АВТООТВЕТЧИК 🤖")
+        print("="*80)
+        print(f"📝 Причина:\n   {reason}")
+        print(f"📝 Саммари диалога:\n   {summary}")
+        print("="*80 + "\n")
+        logger.info(f"Обнаружен автоответчик: reason={reason}, summary={summary}")
     elif function_name == "transfer_to_operator":
         message = args.get("message", "Ожидайте, перевожу на оператора.")
         summary = args.get("summary", "")
@@ -149,14 +200,18 @@ async def setup_session(ws):
                 "\n- НИКОГДА не произноси вслух сам вызов функции (например 'transfer_to_operator(...)' или 'goodbye(...)')"
                 "\n- Пользователь услышит только то, что ты передашь в параметре 'message'"
                 "\n- ЗАПРЕЩЕНО отвечать текстом вместо вызова функции!"
-                "\n- ВАЖНО: Функции goodbye и transfer_to_operator вызываются ТОЛЬКО ОДИН РАЗ! После вызова НЕ нужно ничего больше делать!"
+                "\n- ВАЖНО: Функции goodbye, transfer_to_operator и detect_answering_machine вызываются ТОЛЬКО ОДИН РАЗ! После вызова НЕ нужно ничего больше делать!"
                 "\n\nОБЯЗАТЕЛЬНО ИСПОЛЬЗУЙ ФУНКЦИИ В ЭТИХ СЛУЧАЯХ: "
-                "\n1) Когда пользователь прощается ('пока', 'до свидания', 'всего доброго') - "
+                "\n1) Если ты понимаешь, что разговариваешь с АВТООТВЕТЧИКОМ (слышишь записанное сообщение, голосовое меню, 'нажмите 1', 'оставьте сообщение после сигнала') - "
+                "НЕМЕДЛЕННО вызови функцию detect_answering_machine с параметрами:"
+                "\n  - summary: краткое резюме в ТРЕТЬЕМ ЛИЦЕ (что услышал ассистент)"
+                "\n  - reason: почему ты решил, что это автоответчик (например: 'Услышано голосовое меню с вариантами выбора')"
+                "\n\n2) Когда пользователь прощается ('пока', 'до свидания', 'всего доброго') - "
                 "ОБЯЗАТЕЛЬНО вызови функцию goodbye с параметрами:"
                 "\n  - message: прощальное сообщение (например: 'До свидания!')"
                 "\n  - summary: краткое резюме диалога в ТРЕТЬЕМ ЛИЦЕ (что обсуждалось)"
                 "\nНЕ отвечай текстом 'до свидания', ВЫЗОВИ ФУНКЦИЮ!"
-                "\n\n2) Когда пользователь ЯВНО ПРОСИТ оператора/живого человека/поддержку "
+                "\n\n3) Когда пользователь ЯВНО ПРОСИТ оператора/живого человека/поддержку "
                 "(говорит 'соедини с оператором', 'хочу поговорить с человеком', 'переведи на оператора', 'дай оператора') - "
                 "ОБЯЗАТЕЛЬНО вызови функцию transfer_to_operator. "
                 "НЕ отвечай текстом 'сейчас соединю', ВЫЗОВИ ФУНКЦИЮ transfer_to_operator с параметрами:"
@@ -192,6 +247,26 @@ async def setup_session(ws):
             },
             # Инструменты для использования в агенте
             "tools": [
+                {
+                    "type": "function",
+                    "name": "detect_answering_machine",
+                    "description": "Обнаружен автоответчик или голосовое меню. Вызывай НЕМЕДЛЕННО, если слышишь записанное сообщение, голосовое меню, инструкции типа 'нажмите 1', 'оставьте сообщение после сигнала' и т.п.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "summary": {
+                                "type": "string",
+                                "description": "ОБЯЗАТЕЛЬНО: Краткое резюме в ТРЕТЬЕМ ЛИЦЕ - что услышал ассистент (например: 'Ассистент услышал голосовое меню с вариантами выбора')"
+                            },
+                            "reason": {
+                                "type": "string",
+                                "description": "ОБЯЗАТЕЛЬНО: Причина, почему ты решил что это автоответчик (например: 'Услышано голосовое меню', 'Предложено оставить сообщение после сигнала', 'Автоматическое приветствие с вариантами выбора')"
+                            }
+                        },
+                        "required": ["summary", "reason"],
+                        "additionalProperties": False
+                    }
+                },
                 {
                     "type": "function",
                     "name": "goodbye",
@@ -255,7 +330,6 @@ async def downlink(ws, audio_out):
     try:
         async for msg in ws:
             # Проверяем флаг завершения диалога
-            global dialog_should_end
             if dialog_should_end:
                 logger.info("Завершаем downlink по флагу dialog_should_end")
                 break
@@ -273,6 +347,30 @@ async def downlink(ws, audio_out):
                     transcript = message.get("transcript", "")
                     if transcript:
                         logger.info("on_message %s: [user (transcript): %r]", msg_type, transcript)
+                        
+                        # Проверка на автоответчик по регулярным выражениям
+                        is_answering_machine, reason = detect_answering_machine_by_text(transcript)
+                        if is_answering_machine and not termination_function_called:
+                            logger.warning(f"🤖 Автоответчик обнаружен по регулярному выражению: {reason}")
+                            
+                            # Формируем саммари на основе текущего диалога
+                            summary = f"Обнаружен автоответчик. Транскрипт: '{transcript}'"
+                            
+                            # Выводим результат
+                            print(f"\n{'='*60}")
+                            print(f"🤖 АВТООТВЕТЧИК ОБНАРУЖЕН (regex)")
+                            print(f"{'='*60}")
+                            print(f"Причина: {reason}")
+                            print(f"Саммари: {summary}")
+                            print(f"{'='*60}\n")
+                            
+                            # Устанавливаем флаги для завершения
+                            termination_function_called = True
+                            dialog_should_end = True
+                            
+                            # Закрываем соединение
+                            await ws.close()
+                            logger.info("WebSocket соединение закрыто после обнаружения автоответчика")
 
                 # Текст, который сервер отправляет на озвучку
                 case "response.output_text.delta":
@@ -324,7 +422,7 @@ async def downlink(ws, audio_out):
                     function_name = item.get("name")
                     
                     # Проверяем, не была ли уже вызвана функция завершения
-                    if function_name in ["goodbye", "transfer_to_operator"]:
+                    if function_name in ["goodbye", "transfer_to_operator", "detect_answering_machine"]:
                         if termination_function_called:
                             logger.warning(f"Функция {function_name} уже была вызвана, игнорируем повторный вызов")
                             continue
@@ -344,8 +442,8 @@ async def downlink(ws, audio_out):
                         "type": "response.create"
                     })
                     
-                    # Если это goodbye или transfer_to_operator - устанавливаем флаг закрытия после ответа
-                    if function_name in ["goodbye", "transfer_to_operator"]:
+                    # Если это функция завершения - устанавливаем флаг закрытия после ответа
+                    if function_name in ["goodbye", "transfer_to_operator", "detect_answering_machine"]:
                         close_after_response = True
                         logger.info(f"Функция {function_name} вызвана, соединение будет закрыто после озвучки")
 
